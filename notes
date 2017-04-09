@@ -1,0 +1,208 @@
+estimate_memory(self, vocab_size=None, report=None):
+put tokens instead of strings
+
+sub sampling - what and why - http://arxiv.org/pdf/1310.4546.pdf section 2.3
+negative sampling - Essentially, when you know locally that a certain stimulus (context) to the neural-network-in-training should predict word W1, you can trace those connections and nudge the weights to boost that one corresponding output node. But making the W prediction also implies other words shouldn't be predicted. (And maybe there are other words W2, W3, etc that are also good to predict given the same context.) You don't easily have the full global knowledge of all the words to predict or not, and don't want to iterate over *all* the neural-networks output nodes on every training-stimulus. So with negative-sampling, you randomly pick N other words, and just nudge the network to suppress those N corresponding output nodes. By bad luck, one of your N negative words might in fact be W2, a word that the same stimulus *should* predict, given another text example elsewhere in the corpus! But ultimately that doesn't matter, the N words are overwhelmingly likely to be real "shouldn't-predict-here" words, and W2 etc will get their chances to be boosted when they come up in the training data later, so it all works out.
+
+I've seen negative-sampling counts from 2 to 30 mentioned in different papers. The default in the word2vec.c released by Google was 5. There's no always-best value; it depends on your corpus and task. With larger datasets it seems smaller values perform as well or better than larger values.  
+
+People have chosen the number of training epochs by trial-and-error. Typical values in papers are 10-20. Small datasets might benefit from more iterations, but also with small datasets (and large models) there seems a risk of overfitting, giving doc-vectors that do fine on the training due to memorized idiosyncracies of the data, morese than any similarity to the 'topics' we perceive. (There's a fair chance your model is already larger, in total tunable parameters, than your dataset – so that's a big risk here.)
+
+Also note that Doc2Vec inherits a default `iter=5` parameter from its Word2Vec superclass, which means unless that's explicitly set to something else, every call to `train()` does 5 iterations over the data (and its own decay of starting `alpha` to `min_alpha`). So be careful that your manual training-passes don't do more passes, or sawtooth changes to `alpha`, that aren't intended.
+
+try with very few negative examples on the neural network??
+
+VALIDATION SET VALIDATION SET VALIDATION SET VALIDATION SET VALIDATION SET VALIDATION SET VALIDATION SET VALIDATION SET!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+Accuracy : 
+network.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])
+network.fit(storeInputVecInFile, storeOutputVecInFile, nb_epoch = 1, batch_size = 1, verbose = 2)
+
+Case 1 : - .25361
+network.add(Dense(output_dim=300, input_dim=900, init='uniform', activation='sigmoid'))
+network.add(Dense(200, init='uniform', activation='sigmoid'))
+network.add(Dense(50, init='uniform', activation='sigmoid'))
+network.add(Dense(50, init='uniform', activation='sigmoid', bias=True))
+network.add(Dense(1, init='uniform', activation='sigmoid', bias=True))
+ 
+Case 2 : - 0.21857
+network.add(Dense(output_dim=600, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(400, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(200, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(100, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(50, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(1, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+Case 3 : 0.27245
+network.add(Dense(output_dim=700, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(500, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(250, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(50, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(1, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+case 4 : 0.22120
+network.add(Dense(output_dim=700, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(500, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(250, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(120, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(50, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(1, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+case 5 : 0.21726
+network.add(Dense(output_dim=700, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(500, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(50, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(1, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+case 6 : 0.27070
+
+network.add(Dense(output_dim=700, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(50, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(1, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+case 7 : 0.21551
+
+network.add(Dense(output_dim=700, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(1, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+case 8 : 0.27157
+network.add(Dense(output_dim=800, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(650, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(500, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(350, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(200, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(50, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(1, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+case 9 : 0.27026
+network.add(Dense(output_dim=800, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(600, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(350, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(150, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(1, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+case 10 - 0.27026 (even with batch size = 2500 in train and batch size = 1 in test with 2500 in train)
+network.add(Dense(output_dim=900, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(950, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(450, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(1, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+case 11 : 0.23609
+
+network.add(Dense(output_dim=900, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(900, init='uniform', activation='relu', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(900, init='uniform', activation='relu', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(900, init='uniform', activation='relu', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(950, init='uniform', activation='relu', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(450, init='uniform', activation='relu', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dense(1, init='uniform', activation='relu', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+case 12 : 0.22470
+
+leftNetwork = Sequential()
+leftNetwork.add(Dense(output_dim=700, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+leftNetwork.add(Dense(450, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+leftNetwork.add(Dense(300, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+rightNetwork = Sequential()
+rightNetwork.add(Dense(output_dim=700, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+mergedNetwork = Sequential()
+merged = Merge([leftNetwork, rightNetwork], mode='concat',concat_axis=1)
+mergedNetwork.add(merged)
+mergedNetwork.add(Activation('relu'))
+mergedNetwork.add(Dense(250, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+mergedNetwork.add(Dense(50, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+mergedNetwork.add(Dense(1, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+mergedNetwork.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])
+
+mergedNetwork.fit([storeInputVecInFile, storeInputVecInFile], storeOutputVecInFile, nb_epoch = 1, batch_size = 2500, verbose = 2)
+
+case 13 : 0.26106
+
+network.add(Dense(output_dim=900, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(950, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(450, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(1, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+case 14: 0.22908
+
+network.add(Dense(output_dim=900, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(950, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(450, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(1, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+#network.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])
+
+leftNetwork = Sequential()
+leftNetwork.add(Dense(output_dim=700, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+leftNetwork.add(Dense(450, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+leftNetwork.add(Dense(300, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+rightNetwork = Sequential()
+rightNetwork.add(Dense(output_dim=700, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+mergedNetwork = Sequential()
+merged = Merge([leftNetwork, rightNetwork, network], mode='concat',concat_axis=1)
+mergedNetwork.add(merged)
+mergedNetwork.add(Activation('relu'))
+mergedNetwork.add(Dense(250, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+mergedNetwork.add(Dense(50, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+mergedNetwork.add(Dense(1, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+mergedNetwork.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])
+
+case 15 : 0.26851  numPages = 1
+network.add(Dense(output_dim=900, input_dim=900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(900, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(950, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(450, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+network.add(Dropout(0.3))
+network.add(Dense(1, init='uniform', activation='sigmoid', bias=True, W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+updateCachedStopWords = [u'i', u'me', u'my', u'myself', u'we', u'our', u'ours', u'ourselves', u'you', u'your', u'yours', u'yourself', u'yourselves', u'he', u'him', u'his', u'himself', u'she', u'her', u'hers', u'herself', u'it', u'its', u'itself', u'they', u'them', u'their', u'theirs', u'themselves', u'what', u'which', u'who', u'whom', u'this', u'that', u'these', u'those', u'am', u'is', u'are', u'was', u'were', u'be', u'been', u'being', u'have', u'has', u'had', u'having', u'do', u'does', u'did', u'doing', u'a', u'an', u'the', u'and', u'but', u'if', u'or', u'because', u'as', u'until', u'while', u'of', u'at', u'by', u'for', u'with', u'about', u'against', u'between', u'into', u'through', u'during', u'before', u'after', u'above', u'below', u'to', u'from', u'up', u'down', u'in', u'out', u'on', u'off', u'over', u'under', u'again', u'further', u'then', u'once', u'here', u'there', u'when', u'where', u'why', u'how', u'all', u'any', u'both', u'each', u'few', u'more', u'most', u'other', u'some', u'such', u'no', u'nor', u'not', u'only', u'own', u'same', u'so', u'than', u'too', u'very', u's', u't', u'can', u'will', u'just', u'don', u'should', u'now', u'd', u'll', u'm', u'o', u're', u've', u'y', u'ain', u'aren', u'couldn', u'didn', u'doesn', u'hadn', u'hasn', u'haven', u'isn', u'ma', u'mightn', u'mustn', u'needn', u'shan', u'shouldn', u'wasn', u'weren', u'won', u'wouldn']

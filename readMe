@@ -1,0 +1,8 @@
+model2 - without dbow
+model3 - with dbow
+
+model3 = g.Doc2Vec(docs, size=vector_size, window=window_size, min_count=min_count, sample=sampling_threshold, workers=worker_count, hs=0, dm=dm, negative=negative_size, dbow_words=1, dm_concat=1)
+model2 = g.Doc2Vec(docs, size=vector_size, window=window_size, min_count=min_count, sample=sampling_threshold, workers=worker_count, hs=0, dm=dm, negative=negative_size, dm_concat=1)
+
+inputTokens2 - means numPages = 2
+inputTokens3 - means numPages = 3
